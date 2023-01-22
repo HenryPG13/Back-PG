@@ -52,29 +52,49 @@ mercadopago.configure({
   });
   router.post('', (req,res) => {
     // res.status(200).send("funciona")
-    const product = req.body
-    // console.log("ESTO TIENE PRODUCT ", product);
-    let preference = {
-        items : [{
-            id: product._id,             //En nuestro caso seria el id del producto/zapatilla
-            modelo: product.modelo, //En nuestro caso seria el modelo de la zapatilla
-            imagen: product.imagenes[0], //En nuestro caso seria la imagen del producto
-            color: product.color,
-            talla: product.talle,
-            marca: product.marca,
-            unit_price: product.precio,
-            descripcion: product.descripcion,
-            quantity: 1,
-            currency: 'ARS',
-        }],
-        back_urls:{
-           success: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-           failure: '',
-           pending: ''
-        },
-        auto_return: 'approved',
-        binary_mode: true,
-    }
+    const products = req.body
+
+    const chequeoInv = products.map(prods => { return { ...prods, inventario: prods.inventario - prods.qty } });
+
+    const articulos = chequeoInv.map(prods => { return { id: prods._id, picture_url: prods.imagenes[0], category_id: "fashion", title: prods.modelo, unit_price: prods.precio, description: prods.descripcion, quantity: prods.qty, currency_id: "ARS" } });
+
+    
+    console.log("ESTO TIENE ARTICULOS ", articulos);
+    
+    const preference = {
+      items: articulos,
+      back_urls: {
+        success: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        failure: "",
+        pending: "",
+      },
+      auto_return: "approved",
+      binary_mode: true,
+    };
+    // preference = {
+    //   items: [
+    //     {
+    //       id: product[0]._id, //En nuestro caso seria el id del producto/zapatilla
+    //       title: product[0].modelo, //En nuestro caso seria el modelo de la zapatilla
+    //       picture_url: product[0].imagenes && product[0].imagenes[0], //En nuestro caso seria la imagen del producto
+    //       color: product[0].color,
+    //       talla: product[0].talle,
+    //       category_id: "fashion",
+    //       unit_price: product[0].precio,
+    //       description: product[0].descripcion,
+    //       quantity: product[0].qty,
+    //       currency_id: "ARS",
+    //     },
+    //   ],
+    //   back_urls: {
+    //     success: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    //     failure: "",
+    //     pending: "",
+    //   },
+    //   auto_return: "approved",
+    //   binary_mode: true,
+    // };
+    
     mercadopago.preferences.create(preference).then((response)=>
     res.status(200).send({response})).catch((error)=>
      res.status(400).send({error:error.message})) 

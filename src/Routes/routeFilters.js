@@ -8,94 +8,110 @@ const router = express.Router();
 router.get('', async (req, res) => {
 
     const products = await zapSchema.find();
-    const { precio, talla, actividad, order } = req.query;
-    let filterProducts = []
+    const { precio, talle, actividad, order } = req.query;
+    let filterProducts = [];
 
-    if (precio && talla && actividad) {
-        products.forEach((e) => {
-            if (e.precio <= precio && e.talles.find(e => e == talla) && e.actividad.toLowerCase() == actividad.toLocaleLowerCase()) {
-                filterProducts.push(e)
-            }
-        })
-        if(order !== 'default') {
-            const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
+    if (!precio && !talle && !actividad) {
+        if (order !== 'default') {
+            const orderedProducts = await setOrder(products, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
-        return res.send(filterProducts);
-        
+        return res.send(products);
     };
-    if (precio && talla) {
+
+    if (precio && talle && actividad) {
         products.forEach((e) => {
-            if (e.precio <= precio && e.talles.find(e => e == talla)) {
+            if (e.precio <= precio && e.talle === talle && e.actividad.toLowerCase() === actividad.toLocaleLowerCase()) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
         return res.send(filterProducts);
     };
+
+    if (precio && talle) {
+        products.forEach((e) => {
+            if (e.precio <= precio && e.talle === talle) {
+                filterProducts.push(e)
+            }
+        })
+        if (order !== 'default') {
+            const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
+            return res.send(orderedProducts);
+        }
+        return res.send(filterProducts);
+    };
+
     if (precio && actividad) {
         products.forEach((e) => {
-            if (e.precio <= precio && e.actividad.toLowerCase() == actividad.toLocaleLowerCase()) {
+            if (e.precio <= precio && e.actividad.toLowerCase() === actividad.toLocaleLowerCase()) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
         return res.send(filterProducts);
     };
-    if (talla && actividad) {
+
+    if (talle && actividad) {
         products.forEach((e) => {
-            if (e.talles.find(e => e == talla) && e.actividad.toLowerCase() == actividad.toLocaleLowerCase()) {
+            if (e.talle === talle && e.actividad.toLowerCase() === actividad.toLocaleLowerCase()) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
         return res.send(filterProducts);
     };
+
     if (precio) {
         products.forEach((e) => {
             if (e.precio <= precio) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
         return res.send(filterProducts);
     };
-    if (talla) {
+
+    if (talle) {
         products.forEach((e) => {
-            if (e.talles.find(e => e == talla)) {
+
+            if (e.talle == talle) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
             return res.send(orderedProducts);
         }
         res.send(filterProducts);
     };
+
     if (actividad) {
         products.forEach((e) => {
-            if (e.actividad.toLowerCase() == actividad.toLocaleLowerCase()) {
+            if (e.actividad.toLowerCase() === actividad.toLocaleLowerCase()) {
                 filterProducts.push(e)
             }
         })
-        if(order !== 'default') {
+        if (order !== 'default') {
             const orderedProducts = await setOrder(filterProducts, order !== 'default' && order ? order : null);
+            // console.log("ENTRE AL LOG", orderedProducts[0], orderedProducts[3], orderedProducts[5],);
             return res.send(orderedProducts);
         }
         return res.send(filterProducts);
     };
+    
 });
 
 module.exports = router

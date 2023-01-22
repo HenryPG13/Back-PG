@@ -1,16 +1,17 @@
-const express = require('express')
-const userSchema = require('../Models/modelUser.js')
+const express = require('express');
+const userSchema = require('../Models/modelUser.js');
+const productSchema = require('../Models/modelProducts.js');
 
 const router = express.Router()
 
 //Ruta de creacion de usuarios (users)
 router.post('/', async (req, res) => {
     try {
-        const newProduct = await userSchema(req.body);
-        await newProduct.save()
-        res.send(newProduct)
+        const newUser = await userSchema(req.body);
+        await newUser.save()
+        res.send(newUser)
     } catch (error) {
-        res.status(401).send({ error: "error" })
+        res.status(400).send({ error: "error" })
     }
 });
 
@@ -30,7 +31,8 @@ router.post('/login', async (req, res) => {
             createdAt: usuario.createdAt
         })
     } else {
-        res.status(401).send("Usuario y/o contraseña invalidos")    }
+        res.status(401).send("Usuario y/o contraseña invalidos")
+    }
 });
 
 //Ruta de obtener todos los usuarios (users)
@@ -50,13 +52,17 @@ router.get('/:id', (req, res) => {
 });
 
 // Ruta de modificar 1 usuarios especifico (user)
-router.put('/:id', (req, res) => {
-    const { id } = req.params;
-    const { nombre, email, appelido, cumpleaños, contraseña, ciudad, pais, admin } = req.body;
-    userSchema
-        .updateOne({ _id: id }, { $set: { nombre, email, appelido, cumpleaños, contraseña, ciudad, pais, admin } })
-        .then((data) => res.send(data))
-        .catch((e) => res.send({ message: e }));
+router.put('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { nombre, email, apellido, contraseña, ciudad, pais, admin, estado, direccion } = req.body;
+        const user = await userSchema
+            .updateOne({ _id: id }, { $set: { nombre, email, apellido, contraseña, ciudad, pais, admin, estado, direccion } })
+        res.json(user)
+    } catch (error) {
+        res.send({ message: e });
+    }
+
 });
 
 //Ruta de eliminacion de 1 usuarios especifico (user)
@@ -68,4 +74,39 @@ router.delete('/:id', (req, res) => {
         .catch((e) => res.send({ message: e }));
 });
 
-module.exports = router
+router.post('/:idproduct/favorito', async (req, res) => {
+    const { idproduct } = req.params;
+    const { iduser } = req.query;
+    const user = await userSchema.findById(iduser)
+    const product = await productSchema.findById(idproduct)
+
+    if (user) {
+        if (user.favoritos.length > 0) {
+            const alreadyFav = user.favoritos.find(
+                (e) => e.modelo.toString() === product.modelo.toString()
+            )
+            if (alreadyFav) {
+                return res.status(400).send("Ya agregaste este producto a favoritos")
+            }
+        }
+        const favorit = {
+            actividad: product.actividad,
+            color: product.color,
+            imagenes: product.imagenes,
+            marca: product.marca,
+            modelo: product.modelo,
+            precio: product.precio,
+            talle: product.talle,
+            descripcion: product.descripcion,
+            producto: idproduct
+        };
+
+        user.favoritos.push(favorit);
+        await user.save();
+        res.status(201).json({ mensaje: "producto agregado a favoritos" })
+    } else {
+        res.status(404).send("Producto no encontrado")
+    }
+});
+
+module.exports = router;

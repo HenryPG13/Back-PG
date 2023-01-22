@@ -8,7 +8,8 @@ const orderSchema = mongoose.Schema({
     },
     orderItems: [
         {
-            nombre: { type: String, required: true },
+            marca: { type: String, required: true },
+            modelo: { type: String, required: true },
             cantidad: { type: Number, required: true },
             precio: { type: Number, required: true },
             producto: {
@@ -28,12 +29,6 @@ const orderSchema = mongoose.Schema({
         type: String,
         required: true,
         default: "mercadopago"
-    },
-    resultadoDePago: {
-        id: {type: String},
-        estado: {type: String},
-        fechaDePago: {type: String},
-        email: {type: String}
     },
     precioEnvio: {
         type: Number,
@@ -59,7 +54,7 @@ const orderSchema = mongoose.Schema({
         default: false
     },
     fechaEntrega:{
-        type: Date
+        type: String
     }
 },
     {
@@ -69,4 +64,4 @@ const orderSchema = mongoose.Schema({
 
 const Order = mongoose.model("Order", orderSchema);
 
-module.exports = Order
+module.exports = Order;

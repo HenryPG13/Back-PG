@@ -10,24 +10,28 @@ orderRouter.post('/', async (req, res) => {
         orderItems,
         direccionEntrega,
         metodoDePago,
-        precioProducto,
         precioEnvio,
-        precioTotal
     } = req.body;
 
     if (orderItems && orderItems.length === 0) {
-        res.status(400).send("No order items");
+        res.status(400).send("No hay productos en la orden de compra");
     }
 
     else {
+
+        let totalprice = 0
+        orderItems.forEach(e => {
+            e.precio = e.cantidad * e.precio
+            totalprice = totalprice + e.precio
+        });
+
         const order = new Order({
             usuario,
             orderItems,
             direccionEntrega,
-            precioProducto,
             metodoDePago,
             precioEnvio,
-            precioTotal
+            precioTotal: totalprice
         });
 
         const createOrder = await order.save();
@@ -42,7 +46,18 @@ orderRouter.get('/:id', async (req, res) => {
         res.json(order);
     }
     else {
-        res.status(401).send("Order not found");
+        res.status(401).send("Orden de compra inexistente");
+    }
+});
+
+// GET ALL ORDERS
+orderRouter.get('', async (req, res) => {
+    const order = await Order.find()
+    if (order) {
+        res.json(order);
+    }
+    else {
+        res.status(401).send("No se encuentran ordenes de compra");
     }
 });
 
@@ -52,7 +67,6 @@ orderRouter.put('/:id/pay', async (req, res) => {
 
     if (order) {
         order.estadoPago = true;
-        order.fechaPago = "AGREGAR FUNCION CON FECHA ACTUAL"
         order.resultadoDePago = {
             id: req.body.id,
             estado: req.body.estado,
@@ -60,6 +74,21 @@ orderRouter.put('/:id/pay', async (req, res) => {
             email: req.body.email,
         }
 
+        const updateOrder = await order.save();
+        res.json(updateOrder)
+    }
+    else {
+        res.status(401).send("Order not found");
+    }
+});
+
+//PEDIDO ENTREGADO
+orderRouter.put('/:id/enviado', async (req, res) => {
+    const order = await Order.findById(req.params.id);
+    const {precioEnvio, estadoEntrega} = req.body
+    if (order) {
+        order.estadoEntrega = estadoEntrega;
+        order.precioEnvio = precioEnvio
         const updateOrder = await order.save();
         res.json(updateOrder)
     }

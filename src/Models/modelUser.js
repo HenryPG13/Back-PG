@@ -14,29 +14,22 @@ const userSchema = mongoose.Schema({
     apellido: {
         type: String,
     },
-    cumpleaños: {
-        type: Date,
-    },
     contraseña: {
         type: String,
         required: true,
         select: false
     },
-    ciudad:
-    {
+    favoritos: {
+        type: Array
+    },
+    ciudad: {
         type: String,
     },
-    pais:
-    {
+    pais: {
         type: String,
     },
-    direccion:
-    {
+    direccion: {
         type: String,
-    },
-    tarjeta:
-    {
-        type: Number,
     },
     admin: {
         type: Boolean,

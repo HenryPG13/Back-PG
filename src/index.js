@@ -2,12 +2,12 @@ const express = require('express')
 const mongoose = require('mongoose')
 require('dotenv').config()
 const routeProducts = require('./Routes/routeProducts.js')
-const routeUsers = require ('./Routes/routeUsers.js')
+const routeUsers = require('./Routes/routeUsers.js')
 const routeFilters = require('./Routes/routeFilters.js')
 const uploadImage = require("./uploadImage.js")
 const routeMp = require('./Routes/routeMp.js')
-
-const routeOrders = require ('./Routes/orderRoutes.js')
+const routeOrders = require('./Routes/orderRoutes.js');
+const routeReviews = require("./Routes/routeReviews.js")
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -21,23 +21,24 @@ app.use(function (req, res, next) {
     next();
 });
 
-app.post("/uploadImage", (req, res) =>{
+app.post("/uploadImage", (req, res) => {
     uploadImage(req.body.image)
-    .then((url) => res.send(url))
-    .catch((err) => res.status(500).send(err))
+        .then((url) => res.send(url))
+        .catch((err) => res.status(500).send(err))
 })
 
 app.post("/uploadMultipleImages", (req, res) => {
     uploadImage.uploadMultipleImages(req.body.images)
-      .then((urls) => res.send(urls))
-      .catch((err) => res.status(500).send(err));
-  });
+        .then((urls) => res.send(urls))
+        .catch((err) => res.status(500).send(err));
+});
 
 app.use('/productos/zapatillas', routeProducts);
 app.use('/productos/filtros', routeFilters);
 app.use('/usuarios', routeUsers);
 app.use('/pedido', routeOrders);
-app.use('/payment', routeMp)
+app.use('/payment', routeMp);
+app.use('/productos/revisiones', routeReviews)
 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGO_URI)
