@@ -8,6 +8,7 @@ const uploadImage = require("./uploadImage.js")
 const routeMp = require('./Routes/routeMp.js')
 const routeOrders = require('./Routes/orderRoutes.js');
 const routeReviews = require("./Routes/routeReviews.js")
+const routeOfertas = require("./Routes/routeOfertas.js")
 
 const app = express()
 const port = process.env.PORT || 3001
@@ -39,6 +40,7 @@ app.use('/usuarios', routeUsers);
 app.use('/pedido', routeOrders);
 app.use('/payment', routeMp);
 app.use('/productos/revisiones', routeReviews)
+app.use('/productos/ofertas', routeOfertas)
 
 mongoose.set('strictQuery', false);
 mongoose.connect(process.env.MONGO_URI)
