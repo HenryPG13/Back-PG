@@ -30,22 +30,17 @@ const orderSchema = mongoose.Schema({
         required: true,
         default: "mercadopago"
     },
-    precioEnvio: {
-        type: Number,
-        required: true,
-        default: 0.0,
-    },
     precioTotal: {
         type: Number,
         required: true,
         default: 0.0,
     },
     estadoPago: {
-        type: Boolean,
+        type: String,
         required: true,
-        default: false
+        default: "pending"
     },
-    fechaPago: {
+    fechaCreacion: {
         type: String
     },
     estadoEntrega:{
@@ -53,9 +48,6 @@ const orderSchema = mongoose.Schema({
         required: true,
         default: false
     },
-    fechaEntrega:{
-        type: String
-    }
 },
     {
         timestamps: true
