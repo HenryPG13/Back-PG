@@ -68,9 +68,9 @@ router.get('/:id', (req, res) => {
 // Ruta de modificar 1 producto especifico (zapatilla)
 router.put('/:id', (req, res) => {
     const { id } = req.params;
-    const { actividad, color, imagen1, imagen2, imagen3, marca, modelo, precio, talles } = req.body;
+    const { actividad, color, imagen1, imagen2, imagen3, marca, modelo, precio, talles, oferta } = req.body;
     zapSchema
-        .updateOne({ _id: id }, { $set: { actividad, color, imagen1, imagen2, imagen3, marca, modelo, precio, talles } })
+        .updateOne({ _id: id }, { $set: { actividad, color, imagen1, imagen2, imagen3, marca, modelo, precio, talles, oferta } })
         .then((data) => res.send(data))
         .catch((e) => res.send({ message: e }));
 });
