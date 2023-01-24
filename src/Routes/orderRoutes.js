@@ -8,35 +8,40 @@ const orderRouter = express.Router();
 //CREATE ORDER
 orderRouter.post("/", async (req, res) => {
     try {
-      const { items, user, total } = req.body;
-
+      const { items, user, total, direccion, ciudad, pais } = req.body;
+      
       const respuesta = items.map((p) => {
         return { ...p, stock: p.inventario - p.qty };
       });
-
+      
+      
       const arts = respuesta.map((prods) => {
+        // console.log("ESTO ES PRODS ", prods);
         return {
-          id: prods._id,
-          picture_url: prods.imagenes[0],
+          id: prods.producto,
+          // picture_url: prods.imagenes[0],
           category_id: "fashion",
-          title: prods.modelo,
-          unit_price: prods.precio,
-          description: prods.descripcion,
+          title: prods.nombreArticulo,
+          unit_price: prods.precioVenta,
+          // description: prods.descripcion,
           quantity: prods.qty,
           currency_id: "ARS",
         };
       });
-
+      
+      
       const artOrder = respuesta.map((p) => {
         return {
           marca: p.marca,
-          modelo: p.modelo,
+          modelo: p.nombreArticulo,
           cantidad: p.qty,
-          precio: p.precio,
-          producto: p._id,
+          precio: p.precioVenta,
+          producto: p.producto,
         };
       });
-
+      
+      
+      
       for (const q in respuesta) {
         if (q.stock < 0) {
           res.status(400).json({
@@ -44,8 +49,9 @@ orderRouter.post("/", async (req, res) => {
           });
         }
       }
-
+      
       if (items && items.length === 0) {
+        
         res.status(400).send("No hay productos en la orden de compra");
       } else {
         const preference = {
@@ -58,31 +64,44 @@ orderRouter.post("/", async (req, res) => {
           auto_return: "approved",
           binary_mode: true,
         };
-
+        
+        
         const resp = await mercadopago.preferences.create(preference);
-        const userInfo = userSchema.findById(user);
+        
+        const usuarios = await userSchema.find();
+        const userInfo = usuarios.filter(obj => obj._id === user);
+        
+        
+        
+        
         const order = {
           usuario: user,
           direccionEntrega: {
-            direccion: userInfo.direccion,
-            ciudad: userInfo.ciudad,
-            pais: userInfo.pais,
+            direccion: direccion,
+            ciudad: ciudad,
+            pais: pais,
           },
+          orderItems: artOrder,
           metodoDePago: "mercadopago",
           preferenceId: resp.body.id,
           precioTotal: total,
           estadoPago: "pending",
           fechaCreacion: new Date()
-            .toLocaleString()
-            .replace(",", "")
-            .replace(/:.. /, " "),
+          .toLocaleString()
+          .replace(",", "")
+          .replace(/:.. /, " "),
           estadoEntrega: false,
         };
-
+        
+        
         const nuevaOrden = new Order(order);
-        const saveOrder = await nuevaOrden.save();
+        
+        await nuevaOrden.save();
+        
 
-        res.status(201).json({ msg: "Orden creada con exito", order });
+        res
+          .status(201)
+          .json({ msg: "Orden creada con exito", ordenResp: nuevaOrden });
       }
     } catch {
         res.status(404);
