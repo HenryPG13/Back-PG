@@ -22,13 +22,16 @@ const orderSchema = mongoose.Schema({
     direccionEntrega: {
         direccion: {type: String, required: true},
         ciudad: {type: String, required: true},
-        codigoPostal: {type: String, required: true},
         pais: {type: String, required: true},
     },
     metodoDePago: {
         type: String,
         required: true,
         default: "mercadopago"
+    },
+    preferenceId: {
+        type: String,
+        required:true
     },
     precioTotal: {
         type: Number,
