@@ -45,13 +45,12 @@ orderRouter.post("/", async (req, res) => {
       for (const q in respuesta) {
         if (q.stock < 0) {
           res.status(400).json({
-            msg: "sin inventario",
+            msg: "La cantidad solicitada de " + q.nombreArticulo + " supera el stock disponible." 
           });
         }
       }
       
       if (items && items.length === 0) {
-        
         res.status(400).send("No hay productos en la orden de compra");
       } else {
         const preference = {
@@ -83,6 +82,8 @@ orderRouter.post("/", async (req, res) => {
           orderItems: artOrder,
           metodoDePago: "mercadopago",
           preferenceId: resp.body.init_point,
+          // preferenceInit: resp.body.init_point,
+          // preferenceId: resp.body.id,
           precioTotal: total,
           estadoPago: "pending",
           fechaCreacion: new Date()
@@ -98,6 +99,7 @@ orderRouter.post("/", async (req, res) => {
         
         await nuevaOrden.save();
         
+        console.log("LA ORDEN ", nuevaOrden);
 
         res
           .status(201)
