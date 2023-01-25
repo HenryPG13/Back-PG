@@ -73,7 +73,6 @@ orderRouter.post("/", async (req, res) => {
         
         
         
-        
         const order = {
           usuario: user,
           direccionEntrega: {
@@ -83,7 +82,7 @@ orderRouter.post("/", async (req, res) => {
           },
           orderItems: artOrder,
           metodoDePago: "mercadopago",
-          preferenceId: resp.body.id,
+          preferenceId: resp.body.init_point,
           precioTotal: total,
           estadoPago: "pending",
           fechaCreacion: new Date()
@@ -94,6 +93,7 @@ orderRouter.post("/", async (req, res) => {
         };
         
         
+        console.log("LA ORDEN ", order);
         const nuevaOrden = new Order(order);
         
         await nuevaOrden.save();
