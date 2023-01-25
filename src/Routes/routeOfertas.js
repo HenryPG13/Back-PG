@@ -6,30 +6,14 @@ const router = express.Router();
 
 //Ruta para filtrar las zapatillas en oferta
 router.get('', async (req, res) => {
-
     const products = await zapSchema.find();
     let filterOfertas = [];
-
-    console.log(filterOfertas,'DAOSFOAHFOAHSOUAHFAHN')
-    products.forEach((e)=>{
+    products.forEach((e) => {
         if (e.oferta) {
             filterOfertas.push(e)
         }
-    })
-        
-        return res.send(filterOfertas);
-    
-
-   
-
-   
-
-
-    
-
-  
-   
-    
+    });
+    return res.send(filterOfertas);
 });
 
 module.exports = router
