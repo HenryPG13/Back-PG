@@ -48,7 +48,7 @@ const zapSchema = mongoose.Schema({
     inventario: {
         type: Number,
         required: true,
-        default: 0
+        default: 1
     },
     estado: {
         type: Boolean,

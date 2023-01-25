@@ -74,6 +74,7 @@ router.delete('/:id', (req, res) => {
         .catch((e) => res.send({ message: e }));
 });
 
+//AÑADIR FAVORITOS
 router.post('/:idproduct/favorito', async (req, res) => {
     const { idproduct } = req.params;
     const { iduser } = req.query;
@@ -106,6 +107,22 @@ router.post('/:idproduct/favorito', async (req, res) => {
         res.status(201).json({ mensaje: "producto agregado a favoritos" })
     } else {
         res.status(404).send("Producto no encontrado")
+    }
+});
+
+//ELIMINAR FAVORITOS
+router.delete("", async (req, res) => {
+    try {
+        const { modelo } = req.body;
+        const {id} = req.query;
+        const user = await userSchema.findById(id);
+        const revFav = user.favoritos.filter(e => e.modelo.trim() !== modelo.trim())
+
+        user.favoritos = revFav;
+        await user.save();
+        return res.status(200).send(user)
+    } catch (error) {
+        console.log(error)
     }
 });
 
