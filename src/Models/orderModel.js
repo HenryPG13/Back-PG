@@ -29,6 +29,10 @@ const orderSchema = mongoose.Schema({
         required: true,
         default: "mercadopago"
     },
+    // preferenceInit: {
+    //     type: String,
+    //     required:true
+    // },
     preferenceId: {
         type: String,
         required:true
