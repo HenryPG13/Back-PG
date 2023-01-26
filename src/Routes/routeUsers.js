@@ -4,12 +4,25 @@ const productSchema = require('../Models/modelProducts.js');
 
 const router = express.Router()
 
+
+
 //Ruta de creacion de usuarios (users)
 router.post('/', async (req, res) => {
     try {
-        const newUser = await userSchema(req.body);
-        await newUser.save()
-        res.send(newUser)
+        const { email } = req.body;
+        const usuario = await userSchema.findOne({ email });
+        if (usuario) {
+            res.json({
+                _id: usuario._id,
+                nombre: usuario.nombre,
+                email: usuario.email,
+            })
+        }
+        if (!usuario) {
+            const newUser = await userSchema(req.body);
+            await newUser.save()
+            res.send(newUser)
+        }
     } catch (error) {
         res.status(400).send({ error: "error" })
     }
@@ -114,7 +127,7 @@ router.post('/:idproduct/favorito', async (req, res) => {
 router.delete("", async (req, res) => {
     try {
         const { modelo } = req.body;
-        const {id} = req.query;
+        const { id } = req.query;
         const user = await userSchema.findById(id);
         const revFav = user.favoritos.filter(e => e.modelo.trim() !== modelo.trim())
 
