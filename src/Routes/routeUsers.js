@@ -16,6 +16,9 @@ router.post('/', async (req, res) => {
                 _id: usuario._id,
                 nombre: usuario.nombre,
                 email: usuario.email,
+                ciudad: usuario.ciudad,
+                pais: usuario.pais,
+                direccion: usuario.direccion
             })
         }
         if (!usuario) {
@@ -33,7 +36,7 @@ router.post('/login', async (req, res) => {
     const { email, contraseña } = req.body;
     const usuario = await userSchema.findOne({ email });
     const constraseña = await userSchema.findOne({ contraseña });
-
+    console.log(usuario.ciudad)
     if (usuario && constraseña) {
         res.json({
             _id: usuario._id,
@@ -41,7 +44,10 @@ router.post('/login', async (req, res) => {
             email: usuario.email,
             admin: usuario.admin,
             estado: usuario.estado,
-            createdAt: usuario.createdAt
+            createdAt: usuario.createdAt,
+            ciudad: usuario.ciudad,
+            pais: usuario.pais,
+            direccion: usuario.direccion
         })
     } else {
         res.status(401).send("Usuario y/o contraseña invalidos")
@@ -124,19 +130,39 @@ router.post('/:idproduct/favorito', async (req, res) => {
 });
 
 //ELIMINAR FAVORITOS
-router.delete("", async (req, res) => {
-    try {
-        const { modelo } = req.body;
-        const { id } = req.query;
-        const user = await userSchema.findById(id);
-        const revFav = user.favoritos.filter(e => e.modelo.trim() !== modelo.trim())
+// router.delete("", async (req, res) => {
+//     try {
+//         const { producto, id } = req.body;
+//         console.log(id, "usuario")
+//         const user = await userSchema.findById(id);
+//         const revFav = user.favoritos.filter(e => e.producto !== producto)
 
-        user.favoritos = revFav;
-        await user.save();
-        return res.status(200).send(user)
+//         user.favoritos = revFav;
+//         await user.save();
+//         return res.json(user)
+//     } catch (error) {
+//         console.log(error)
+//     }
+// });
+
+//ELIMINAR FAVORITOS
+router.delete("/favoritos/:id", async (req, res) => {
+    try {
+        const { id } = req.params; //ID de producto favorito
+        const users = await userSchema.find();
+        const singleUser = []
+        users.forEach(user => {
+            const x = user.favoritos.filter(e => e.producto == id);
+            if (x.length > 0) singleUser.push(user)
+        });
+
+        const usr = await userSchema.findById(singleUser[0]._id)
+        const favUser = usr.favoritos.filter(e => e.producto !== id)
+        usr.favoritos = favUser;
+        await usr.save();
+        return res.status(200).send(usr)
     } catch (error) {
         console.log(error)
     }
 });
-
 module.exports = router;
