@@ -2,6 +2,7 @@ const express = require('express');
 const mercadopago = require('mercadopago');
 const Order = require('../Models/orderModel.js');
 const userSchema = require('../Models/modelUser.js');
+const zapSchema = require('../Models/modelProducts.js');
 
 const orderRouter = express.Router();
 
@@ -41,17 +42,16 @@ orderRouter.post("/", async (req, res) => {
       });
       
       
-      
       for (const q in respuesta) {
         if (q.stock < 0) {
           res.status(400).json({
-            msg: "La cantidad solicitada de " + q.nombreArticulo + " supera el stock disponible." 
+            msg: "La cantidad solicitada de " + q.nombreArticulo + " supera el stock disponible.", ordenResp: "", estatus: "fail"  
           });
         }
       }
       
       if (items && items.length === 0) {
-        res.status(400).send("No hay productos en la orden de compra");
+        res.status(400).json({ msg: "No hay productos en la orden de compra", ordenResp: "", estatus: "fail" });
       } else {
         const preference = {
           items: arts,
@@ -101,12 +101,14 @@ orderRouter.post("/", async (req, res) => {
         
         console.log("LA ORDEN ", nuevaOrden);
 
+        
+
         res
           .status(201)
-          .json({ msg: "Orden creada con exito", ordenResp: nuevaOrden });
+          .json({ msg: "Orden creada con exito", ordenResp: nuevaOrden, estatus: "ok" });
       }
     } catch {
-        res.status(404);
+        res.status(404).json({ msg: "No hubo respuesta de la base de datos, por favor, intente mas tarde", ordenResp: "", estatus: "fail" });
     }
 });
 // orderRouter.post('/', async (req, res) => {
